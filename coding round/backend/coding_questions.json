@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "Two Sum",
+    "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+    "testcases": [
+      { "input": "4\n2 7 11 15\n9\n", "expected_output": "[0,1]\n" },
+      { "input": "3\n3 2 4\n6\n", "expected_output": "[1,2]\n" }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Reverse String",
+    "description": "Write a function that reverses a string.",
+    "testcases": [
+      { "input": "hello\n", "expected_output": "olleh\n" },
+      { "input": "OpenAI\n", "expected_output": "IAnepO\n" }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Fibonacci Number",
+    "description": "Given n, return the nth Fibonacci number.",
+    "testcases": [
+      { "input": "5\n", "expected_output": "5\n" },
+      { "input": "10\n", "expected_output": "55\n" }
+    ]
+  }
+]
