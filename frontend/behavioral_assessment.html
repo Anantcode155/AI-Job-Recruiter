@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behavioral Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 300;
+        }
+
+        .progress-container {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+
+        .question-container {
+            padding: 50px;
+            min-height: 500px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        }
+
+        .question {
+            margin-bottom: 40px;
+        }
+
+        .question h3 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .question-type {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .mcq-options {
+            display: grid;
+            gap: 20px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 20px;
+            transform: scale(1.3);
+            accent-color: #667eea;
+        }
+
+        .text-response {
+            width: 100%;
+            min-height: 180px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .text-response:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .word-count {
+            text-align: right;
+            margin-top: 15px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .word-count.warning {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .timer {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .timer.warning {
+            background: #ff4757;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .question-container {
+                padding: 20px;
+            }
+            
+            .navigation {
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Behavioral Assessment</h1>
+            <p>Complete assessment to evaluate your behavioral competencies</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="progressText">Question 1 of 15</div>
+        </div>
+
+        <div id="loadingMessage" class="loading">
+            <h3>Loading behavioral questions...</h3>
+            <div class="spinner"></div>
+        </div>
+
+        <div id="questionInterface" class="hidden">
+            <div class="question-container">
+                <div class="question">
+                    <div class="question-type" id="questionType">MCQ</div>
+                    <h3 id="questionText">Loading question...</h3>
+                    
+                    <div id="mcqContainer" class="hidden">
+                        <div class="mcq-options" id="mcqOptions">
+                            <!-- MCQ options will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div id="textContainer" class="hidden">
+                        <textarea id="textResponse" class="text-response" placeholder="Please provide a detailed response..."></textarea>
+                        <div class="word-count" id="wordCount">0 words</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button id="prevBtn" class="btn btn-secondary" onclick="previousQuestion()" disabled>← Previous</button>
+                
+                <div class="timer" id="timer">
+                    Time: <span id="timeDisplay">2:00</span>
+                </div>
+                
+                <button id="nextBtn" class="btn btn-primary" onclick="nextQuestion()">Next →</button>
+            </div>
+        </div>
+
+        <div id="completionMessage" class="hidden">
+            <div class="question-container">
+                <div class="success">
+                    <h3>🎉 Behavioral Assessment Completed!</h3>
+                    <p>Thank you for completing the behavioral assessment. Your responses have been analyzed and recorded.</p>
+                    <p>Redirecting to final results...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let behavioralQuestions = [];
+        let currentQuestionIndex = 0;
+        let candidateId = localStorage.getItem("candidate_id");
+        let responses = {};
+        let questionTimer = null;
+        let timeLeft = 120; // 2 minutes per question
+        let totalQuestions = 15;
+
+        // Security features
+        let tabSwitchCount = 0;
+        let warningShown = false;
+        let videoStream = null;
+        let mediaRecorder = null;
+
+        // Security functions
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    videoStream = stream;
+                    console.log("Camera started for behavioral assessment");
+                })
+                .catch(err => {
+                    console.log("Camera access denied:", err);
+                });
+        }
+
+        function trackTabSwitch() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    tabSwitchCount++;
+                    fetch(`/track_tab_switch/${candidateId}`, { method: 'POST' });
+                    
+                    if (!warningShown) {
+                        alert(`⚠️ WARNING: Tab switching detected!\n\nPlease stay on this page during the assessment.\n\nTab switches: ${tabSwitchCount}`);
+                        warningShown = true;
+                    }
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                tabSwitchCount++;
+                fetch(`/track_tab_switch/${candidateId}`, { method: 'POST' });
+            });
+        }
+
+        // Initialize the assessment
+        async function initBehavioralAssessment() {
+            try {
+                // Start security features
+                startCamera();
+                trackTabSwitch();
+                
+                // Load questions
+                const response = await fetch('/get_behavioral_questions');
+                const data = await response.json();
+                behavioralQuestions = data.questions;
+                totalQuestions = behavioralQuestions.length;
+
+                // Update progress
+                updateProgress();
+
+                // Load first question
+                loadQuestion(0);
+
+                // Hide loading, show interface
+                document.getElementById("loadingMessage").classList.add("hidden");
+                document.getElementById("questionInterface").classList.remove("hidden");
+
+                // Start timer
+                startTimer();
+
+            } catch (error) {
+                console.error("Error loading behavioral questions:", error);
+                document.getElementById("loadingMessage").innerHTML = `
+                    <div class="error">
+                        <h3>Error loading questions</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Please refresh the page or contact support.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function loadQuestion(index) {
+            if (index < 0 || index >= behavioralQuestions.length) return;
+
+            currentQuestionIndex = index;
+            const question = behavioralQuestions[index];
+
+            // Update question text
+            document.getElementById("questionText").textContent = question.question;
+            document.getElementById("questionType").textContent = question.type.toUpperCase();
+
+            // Show appropriate container
+            if (question.type === 'mcq') {
+                document.getElementById("mcqContainer").classList.remove("hidden");
+                document.getElementById("textContainer").classList.add("hidden");
+                loadMCQOptions(question);
+            } else {
+                document.getElementById("mcqContainer").classList.add("hidden");
+                document.getElementById("textContainer").classList.remove("hidden");
+                loadTextResponse(question);
+            }
+
+            // Update navigation buttons
+            document.getElementById("prevBtn").disabled = index === 0;
+            document.getElementById("nextBtn").textContent = index === behavioralQuestions.length - 1 ? "Finish Assessment" : "Next →";
+
+            // Update progress
+            updateProgress();
+
+            // Reset timer
+            resetTimer();
+        }
+
+        function loadMCQOptions(question) {
+            const container = document.getElementById("mcqOptions");
+            container.innerHTML = '';
+
+            Object.entries(question.options).forEach(([key, value]) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.onclick = () => selectOption(key);
+
+                optionDiv.innerHTML = `
+                    <input type="radio" name="mcq" value="${key}" id="option_${key}">
+                    <label for="option_${key}">${key}) ${value}</label>
+                `;
+
+                container.appendChild(optionDiv);
+            });
+
+            // Load saved response
+            const savedResponse = responses[question.id];
+            if (savedResponse) {
+                document.querySelector(`input[value="${savedResponse}"]`).checked = true;
+                document.querySelector(`input[value="${savedResponse}"]`).parentElement.classList.add('selected');
+            }
+        }
+
+        function loadTextResponse(question) {
+            const textarea = document.getElementById("textResponse");
+            textarea.value = responses[question.id] || '';
+            updateWordCount();
+
+            // Load saved response
+            const savedResponse = responses[question.id];
+            if (savedResponse) {
+                textarea.value = savedResponse;
+                updateWordCount();
+            }
+        }
+
+        function selectOption(value) {
+            // Remove previous selection
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            event.currentTarget.classList.add('selected');
+            
+            // Save response
+            const question = behavioralQuestions[currentQuestionIndex];
+            responses[question.id] = value;
+        }
+
+        function updateWordCount() {
+            const textarea = document.getElementById("textResponse");
+            const wordCount = textarea.value.trim().split(/\s+/).length;
+            const countElement = document.getElementById("wordCount");
+            
+            countElement.textContent = `${wordCount} words`;
+            
+            if (wordCount < 20) {
+                countElement.classList.add('warning');
+            } else {
+                countElement.classList.remove('warning');
+            }
+        }
+
+        function nextQuestion() {
+            // Save current response
+            saveCurrentResponse();
+
+            if (currentQuestionIndex < behavioralQuestions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                // Assessment completed
+                completeAssessment();
+            }
+        }
+
+        function previousQuestion() {
+            // Save current response
+            saveCurrentResponse();
+
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function saveCurrentResponse() {
+            const question = behavioralQuestions[currentQuestionIndex];
+            
+            if (question.type === 'mcq') {
+                const selectedOption = document.querySelector('input[name="mcq"]:checked');
+                if (selectedOption) {
+                    responses[question.id] = selectedOption.value;
+                }
+            } else {
+                const textResponse = document.getElementById("textResponse").value;
+                if (textResponse.trim()) {
+                    responses[question.id] = textResponse;
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+            document.getElementById("progressFill").style.width = `${progress}%`;
+            document.getElementById("progressText").textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
+        }
+
+        function startTimer() {
+            questionTimer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(questionTimer);
+                    autoNextQuestion();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(questionTimer);
+            timeLeft = 120; // 2 minutes
+            updateTimerDisplay();
+            startTimer();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById("timeDisplay").textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // Add warning class when time is low
+            const timerElement = document.getElementById("timer");
+            if (timeLeft <= 30) {
+                timerElement.classList.add('warning');
+            } else {
+                timerElement.classList.remove('warning');
+            }
+        }
+
+        function autoNextQuestion() {
+            saveCurrentResponse();
+            
+            if (currentQuestionIndex < behavioralQuestions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                completeAssessment();
+            }
+        }
+
+        async function completeAssessment() {
+            try {
+                // Hide interface, show completion message
+                document.getElementById("questionInterface").classList.add("hidden");
+                document.getElementById("completionMessage").classList.remove("hidden");
+
+                // Submit responses for analysis
+                const response = await fetch(`/submit_behavioral/${candidateId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        responses: responses
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log("Behavioral assessment submitted:", result);
+
+                    // Redirect to final completion page
+                    setTimeout(() => {
+                        window.location.href = "/hr_dashboard";
+                    }, 3000);
+                } else {
+                    throw new Error("Failed to submit behavioral assessment");
+                }
+
+            } catch (error) {
+                console.error("Error completing assessment:", error);
+                document.getElementById("completionMessage").innerHTML = `
+                    <div class="error">
+                        <h3>Error completing assessment</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Please try again or contact support.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Event listeners
+        document.getElementById("textResponse").addEventListener("input", updateWordCount);
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            if (!candidateId) {
+                alert("Candidate details not found. Please start from the beginning.");
+                window.location.href = "/";
+                return;
+            }
+            initBehavioralAssessment();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Coding Round</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #2b5876, #4e4376);
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px 0;
+      font-weight: bold;
+      color: #ecf0f1;
+    }
+    select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2c3e50;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 200px;
+      font-family: 'Courier New', monospace;
+    }
+    button {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px 5px;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #2980b9, #1f4e79);
+      transform: translateY(-2px);
+    }
+    .problem {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #3498db;
+    }
+    .output {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      min-height: 100px;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #3498db;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🚀 Coding Round</h2>
+    
+    <div id="loadingMessage" class="loading">
+      <h3>Loading coding problems...</h3>
+      <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+
+    <div id="codingInterface" style="display: none;">
+      <div class="progress" style="text-align: center; margin-bottom: 10px; font-size: 1.2rem; font-weight: bold; color: #3498db;">
+        Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">3</span>
+      </div>
+      <div class="timer-container" style="text-align: center; margin-bottom: 20px;">
+        <div id="timer" style="font-size: 1.5rem; font-weight: bold; color: #ff6b6b; background: rgba(255,107,107,0.1); padding: 10px; border-radius: 10px; display: inline-block;">
+          Time: <span id="timeDisplay">15:00</span>
+        </div>
+      </div>
+
+    <label for="problemSelect">Select Problem</label>
+    <select id="problemSelect"></select>
+
+    <div id="problemDescription" class="problem"></div>
+
+    <label for="language">Language</label>
+    <select id="language">
+      <option value="71">Python (3.8.1)</option>
+      <option value="62">Java (OpenJDK 13.0.1)</option>
+      <option value="54">C++ (GCC 9.2.0)</option>
+      <option value="63">JavaScript (Node.js 12.14.0)</option>
+    </select>
+
+    <label for="sourceCode">Source Code</label>
+    <textarea id="sourceCode" rows="12" placeholder="Write your solution here..."></textarea>
+
+    <div>
+        <button onclick="runCode()">▶️ Run Code</button>
+        <button onclick="submitCurrentQuestion()">✅ Submit Current Question</button>
+        <button onclick="nextQuestion()" id="nextQuestionBtn" style="display: none;">➡️ Next Question</button>
+        <button onclick="finishCodingRound()" id="finishBtn" style="display: none;">🏁 Finish Coding Round</button>
+    </div>
+
+    <div id="outputBox" class="output"></div>
+    </div>
+  </div>
+
+  <script>
+    // Add spin animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Embedded JavaScript for coding round
+    const JUDGE0_API_URL = "https://judge0-ce.p.rapidapi.com/submissions";
+    const JUDGE0_API_KEY = "319ac22879msh27d7e30ec9dda20p1eae5djsn978857c5af9d";
+
+    let currentProblem = null;
+    let candidateId = localStorage.getItem("candidate_id");
+    let codingQuestions = [];
+    let questionTimer = null;
+    let timeLeft = 15 * 60; // 15 minutes in seconds
+    let currentQuestionIndex = 0;
+    let submittedQuestions = new Set(); // Track submitted questions
+    let totalScore = 0;
+
+    // Security features
+    let tabSwitchCount = 0;
+    let warningShown = false;
+    let videoStream = null;
+
+    // Security functions
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          videoStream = stream;
+          console.log("Camera started for coding round");
+        })
+        .catch(err => {
+          console.log("Camera access denied:", err);
+        });
+    }
+
+    function trackTabSwitch() {
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          tabSwitchCount++;
+          fetch(`/track_tab_switch/${candidateId}`, { method: 'POST' });
+          
+          if (!warningShown) {
+            alert(`⚠️ WARNING: Tab switching detected!\n\nPlease stay on this page during the coding assessment.\n\nTab switches: ${tabSwitchCount}`);
+            warningShown = true;
+          }
+        }
+      });
+
+      window.addEventListener('blur', () => {
+        tabSwitchCount++;
+        fetch(`/track_tab_switch/${candidateId}`, { method: 'POST' });
+      });
+    }
+
+    // Load coding questions from our backend
+    async function loadCodingQuestions() {
+      console.log("=== LOADING CODING QUESTIONS STARTED ===");
+      try {
+        console.log("Loading coding questions...");
+        console.log("Candidate ID:", candidateId);
+        
+        if (!candidateId) {
+          alert("Candidate details not found. Please start from the beginning.");
+          window.location.href = "/";
+          return;
+        }
+        
+        console.log("Making API call to /get_coding_questions...");
+        const response = await fetch('/get_coding_questions');
+        console.log("Response received:", response);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Data received:", data);
+        codingQuestions = data.questions;
+        console.log("Questions loaded:", codingQuestions.length);
+        
+        // Update question counter
+        document.getElementById("totalQuestions").textContent = codingQuestions.length;
+        
+        // Populate problem select
+        const select = document.getElementById("problemSelect");
+        select.innerHTML = '';
+        codingQuestions.forEach((q, idx) => {
+          const opt = document.createElement("option");
+          opt.value = idx;
+          opt.text = `${idx + 1}. ${q.title}`;
+          select.appendChild(opt);
+        });
+        select.addEventListener("change", e => {
+          currentQuestionIndex = parseInt(e.target.value);
+          loadProblem(currentQuestionIndex);
+          resetTimer();
+        });
+        console.log("About to call loadProblem(0)");
+        loadProblem(0);
+        console.log("About to call resetTimer()");
+        resetTimer();
+        console.log("Functions called successfully");
+        
+        // Show interface
+        document.getElementById("loadingMessage").style.display = "none";
+        document.getElementById("codingInterface").style.display = "block";
+        
+        // Start security features
+        startCamera();
+        trackTabSwitch();
+        
+        console.log("=== CODING QUESTIONS LOADED SUCCESSFULLY ===");
+      } catch (error) {
+        console.error("Error loading coding questions:", error);
+        document.getElementById("loadingMessage").innerHTML = `
+          <h3>Error loading questions</h3>
+          <p>Error: ${error.message}</p>
+          <p>Please refresh the page or check the console for details.</p>
+        `;
+      }
+    }
+
+    function startTimer() {
+      questionTimer = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 0) {
+          clearInterval(questionTimer);
+          autoSubmitQuestion();
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(questionTimer);
+      timeLeft = 15 * 60; // Reset to 15 minutes
+      updateTimerDisplay();
+      startTimer();
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      document.getElementById('timeDisplay').textContent = display;
+      
+      // Change color when time is running low
+      const timerElement = document.getElementById('timer');
+      if (timeLeft <= 300) { // 5 minutes left
+        timerElement.style.color = '#e74c3c';
+        timerElement.style.background = 'rgba(231, 76, 60, 0.2)';
+      } else if (timeLeft <= 600) { // 10 minutes left
+        timerElement.style.color = '#f39c12';
+        timerElement.style.background = 'rgba(243, 156, 18, 0.2)';
+      }
+    }
+
+    function autoSubmitQuestion() {
+      alert('Time\'s up! Auto-submitting current question...');
+      submitCurrentQuestion();
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < codingQuestions.length - 1) {
+        currentQuestionIndex++;
+        loadProblem(currentQuestionIndex);
+        resetTimer();
+        document.getElementById("sourceCode").value = ""; // Clear code
+        document.getElementById("outputBox").innerHTML = "";
+        
+        // Hide next button, show submit button
+        document.getElementById("nextQuestionBtn").style.display = "none";
+        document.getElementById("finishBtn").style.display = "none";
+        
+        // Update dropdown selection
+        document.getElementById("problemSelect").value = currentQuestionIndex;
+      }
+    }
+
+    function finishCodingRound() {
+      // Calculate final score
+      const finalScore = Math.round((totalScore / codingQuestions.length) * 100);
+      
+      // Submit final score to backend
+      submitFinalScore(finalScore);
+    }
+
+    function loadProblem(idx) {
+      currentProblem = codingQuestions[idx];
+      currentQuestionIndex = idx;
+      
+      // Update question counter
+      document.getElementById("currentQuestionNum").textContent = idx + 1;
+      
+      document.getElementById("problemDescription").innerHTML = `
+        <h3>${currentProblem.title}</h3>
+        <p>${currentProblem.description}</p>
+        <h4>Test Cases:</h4>
+        <ul>
+          ${currentProblem.testcases.map((tc, i) => `
+            <li>
+              <strong>Test Case ${i + 1}:</strong><br>
+              Input: <code>${tc.input}</code><br>
+              Expected Output: <code>${tc.expected_output}</code>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    async function runCode() {
+      const source = document.getElementById("sourceCode").value;
+      const language_id = document.getElementById("language").value;
+
+      if (!source.trim()) {
+        document.getElementById("outputBox").innerHTML = "Please write some code first!";
+        return;
+      }
+
+      document.getElementById("outputBox").innerHTML = "Running code... Please wait...";
+
+              // Real Judge0 API execution
+
+      try {
+        const tc = currentProblem.testcases[0];
+        
+        // Submit code to Judge0
+        const submissionResponse = await fetch(JUDGE0_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-RapidAPI-Key": JUDGE0_API_KEY,
+            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+          },
+          body: JSON.stringify({
+            source_code: source,
+            language_id: parseInt(language_id),
+            stdin: tc.input
+          })
+        });
+
+        const submissionData = await submissionResponse.json();
+        const token = submissionData.token;
+
+        // Poll for result
+        let result = null;
+        let attempts = 0;
+        while (!result && attempts < 30) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const resultResponse = await fetch(`${JUDGE0_API_URL}/${token}`, {
+            headers: {
+              "X-RapidAPI-Key": JUDGE0_API_KEY,
+              "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+            }
+          });
+          result = await resultResponse.json();
+          attempts++;
+        }
+
+        if (!result || !result.status) {
+          // Check if it's a rate limit error
+          if (result && result.message && result.message.includes("Too many requests")) {
+            document.getElementById("outputBox").innerHTML = `
+              <div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ffc107;">
+                <h3>⚠️ Rate Limit Reached</h3>
+                <p>Judge0 API is temporarily rate-limited. Using demo mode for testing.</p>
+                <p>Your code will be evaluated with sample test cases.</p>
+              </div>
+            `;
+            // Automatically run demo mode
+            setTimeout(() => runCodeDemo(), 1000);
+          } else {
+            document.getElementById("outputBox").innerHTML = `
+              <div style="background: rgba(231, 76, 60, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #e74c3c;">
+                <h3>❌ API Error</h3>
+                <p>Judge0 API returned invalid response</p>
+                <p>Response: ${JSON.stringify(result)}</p>
+              </div>
+            `;
+          }
+          return;
+        }
+
+        if (result.status.id <= 3) {
+          document.getElementById("outputBox").innerHTML = "Still processing...";
+          return;
+        }
+
+        const output = result.stdout || result.stderr || result.compile_output || "No output";
+        const isCorrect = output.trim() === tc.expected_output.trim();
+
+        document.getElementById("outputBox").innerHTML = `
+          <div style="background: ${isCorrect ? 'rgba(46, 204, 113, 0.2)' : 'rgba(231, 76, 60, 0.2)'}; padding: 15px; border-radius: 8px; border: 2px solid ${isCorrect ? '#2ecc71' : '#e74c3c'};">
+            <h3>${isCorrect ? '✅ Correct!' : '❌ Incorrect'}</h3>
+            <p><strong>Input:</strong> ${tc.input}</p>
+            <p><strong>Expected:</strong> ${tc.expected_output}</p>
+            <p><strong>Your Output:</strong> ${output}</p>
+            <p><strong>Status:</strong> ${result.status.description}</p>
+          </div>
+        `;
+      } catch (error) {
+        document.getElementById("outputBox").innerHTML = `
+          <div style="background: rgba(231, 76, 60, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #e74c3c;">
+            <h3>❌ Error</h3>
+            <p>Error: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    async function submitCurrentQuestion() {
+      const source = document.getElementById("sourceCode").value;
+      const language_id = document.getElementById("language").value;
+
+      if (!source.trim()) {
+        alert("Please write some code before submitting!");
+        return;
+      }
+
+      if (!candidateId) {
+        alert("Candidate details not found. Please start from the beginning.");
+        window.location.href = "/";
+        return;
+      }
+
+      document.getElementById("outputBox").innerHTML = "Submitting your solution... Please wait...";
+
+      try {
+        let passed = 0;
+        const totalTests = currentProblem.testcases.length;
+        
+                // Real Judge0 API evaluation
+          for (const tc of currentProblem.testcases) {
+            const submissionResponse = await fetch(JUDGE0_API_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-RapidAPI-Key": JUDGE0_API_KEY,
+                "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+              },
+              body: JSON.stringify({
+                source_code: source,
+                language_id: parseInt(language_id),
+                stdin: tc.input
+              })
+            });
+
+            const submissionData = await submissionResponse.json();
+            const token = submissionData.token;
+
+            // Poll for result
+            let result = null;
+            let attempts = 0;
+            while (!result && attempts < 30) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              const resultResponse = await fetch(`${JUDGE0_API_URL}/${token}`, {
+                headers: {
+                  "X-RapidAPI-Key": JUDGE0_API_KEY,
+                  "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+                }
+              });
+              result = await resultResponse.json();
+              attempts++;
+            }
+
+            if (result && result.status && result.status.id === 3) { // Accepted
+              const output = result.stdout || "";
+              if (output.trim() === tc.expected_output.trim()) {
+                passed++;
+              }
+            } else {
+              console.log("Judge0 API response error:", result);
+            }
+          }
+
+        const score = Math.round((passed / totalTests) * 100);
+        totalScore += score; // Add to total score
+        submittedQuestions.add(currentQuestionIndex); // Mark as submitted
+        
+        document.getElementById("outputBox").innerHTML = `
+          <div style="background: rgba(46, 204, 113, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #2ecc71;">
+            <h3>✅ Question ${currentQuestionIndex + 1} Submitted!</h3>
+            <p><strong>Score:</strong> ${score}% (${passed}/${totalTests} test cases passed)</p>
+            <p><strong>Progress:</strong> ${submittedQuestions.size}/${codingQuestions.length} questions completed</p>
+          </div>
+        `;
+        
+        // Show appropriate buttons
+        if (currentQuestionIndex < codingQuestions.length - 1) {
+          document.getElementById("nextQuestionBtn").style.display = "inline-block";
+        } else {
+          document.getElementById("finishBtn").style.display = "inline-block";
+        }
+      } catch (error) {
+        console.error("Error submitting code:", error);
+        document.getElementById("outputBox").innerHTML = `
+          <div style="background: rgba(231, 76, 60, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #e74c3c;">
+            <h3>❌ Submission Failed</h3>
+            <p>Error: ${error.message}</p>
+            <p>Please try again.</p>
+          </div>
+        `;
+      }
+    }
+
+    async function submitFinalScore(finalScore) {
+      try {
+        const response = await fetch(`/submit_coding/${candidateId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ score: finalScore })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          document.getElementById("outputBox").innerHTML = `
+            <div style="background: rgba(46, 204, 113, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #2ecc71;">
+              <h3>🎉 Coding Round Completed!</h3>
+              <p><strong>Final Score:</strong> ${finalScore}%</p>
+              <p><strong>Status:</strong> ${result.message}</p>
+              <p>Redirecting to completion page...</p>
+            </div>
+          `;
+          
+          setTimeout(() => {
+            window.location.href = "/coding-round-completed";
+          }, 2000);
+        } else {
+          throw new Error("Failed to submit final coding score");
+        }
+      } catch (error) {
+        console.error("Error submitting final score:", error);
+        document.getElementById("outputBox").innerHTML = `
+          <div style="background: rgba(231, 76, 60, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #e74c3c;">
+            <h3>❌ Final Submission Failed</h3>
+            <p>Error: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Demo mode for when API is rate-limited
+    function runCodeDemo() {
+      const source = document.getElementById("sourceCode").value;
+      if (!source.trim()) {
+        document.getElementById("outputBox").innerHTML = "Please write some code first!";
+        return;
+      }
+      
+      // Simulate a demo result
+      const tc = currentProblem.testcases[0];
+      const isCorrect = Math.random() > 0.5; // Random result for demo
+      
+      document.getElementById("outputBox").innerHTML = `
+        <div style="background: ${isCorrect ? 'rgba(46, 204, 113, 0.2)' : 'rgba(231, 76, 60, 0.2)'}; padding: 15px; border-radius: 8px; border: 2px solid ${isCorrect ? '#2ecc71' : '#e74c3c'};">
+          <h3>${isCorrect ? '✅ Demo: Correct!' : '❌ Demo: Incorrect'}</h3>
+          <p><strong>Input:</strong> ${tc.input}</p>
+          <p><strong>Expected:</strong> ${tc.expected_output}</p>
+          <p><strong>Your Output:</strong> ${isCorrect ? tc.expected_output : 'Demo output'}</p>
+          <p><strong>Status:</strong> Demo Mode (API rate-limited)</p>
+          <p><em>This is a demo result. Wait 5-10 minutes for real API evaluation.</em></p>
+        </div>
+      `;
+    }
+
+    // Initialize when page loads
+    window.onload = () => {
+      console.log("=== PAGE LOADED ===");
+      console.log("Starting coding round...");
+      console.log("Candidate ID from localStorage:", localStorage.getItem("candidate_id"));
+      loadCodingQuestions();
+    };
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HR Dashboard</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: linear-gradient(135deg,#667eea,#764ba2); min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'Segoe UI',sans-serif; }
+.container { background: rgba(255,255,255,0.95); padding: 2.5rem; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width:90%; max-width:900px; backdrop-filter: blur(10px); animation: slideUp 0.8s ease-out; }
+@keyframes slideUp { from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+h1 { text-align:center; color:#333; font-size:2rem; margin-bottom:1.5rem; }
+table { width:100%; border-collapse: collapse; margin-top:1rem; }
+th, td { text-align:left; padding:12px 16px; border-bottom:1px solid #ddd; }
+th { background: linear-gradient(135deg,#667eea,#764ba2); color:white; font-weight:600; }
+tr:hover { background-color:#f1f1f1; }
+.no-data { text-align:center; margin-top:1rem; color:#666; font-size:1rem; }
+.button-container { text-align:center; margin-top:30px; }
+.refresh-btn, .next-button { display:inline-block; background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:14px 30px; font-size:1.1rem; font-weight:600; border-radius:10px; cursor:pointer; margin:0 10px; transition: transform 0.2s, box-shadow 0.2s; text-decoration:none; }
+.refresh-btn:hover, .next-button:hover { transform:translateY(-2px); box-shadow:0 10px 20px rgba(102,126,234,0.3); }
+.refresh-btn:active, .next-button:active { transform:translateY(0); }
+.dashboard-card {
+    width: 95%; /* or 100%, or max-width: 1200px */
+    margin: 0 auto; /* center the card */
+    padding: 20px; /* some spacing inside */
+}
+.dashboard-container {
+  width: 95%;
+  max-width: 1300px;   /* expand width */
+  background-color: white;
+  margin: 30px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Wrap the table inside a scrollable area */
+.table-container {
+  overflow-x: auto;
+}
+
+/* Make sure the table fills the space properly */
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table-container th, .table-container td {
+  word-wrap: break-word;
+  white-space: normal;
+  padding: 10px;
+  text-align: left;
+}
+
+</style>
+</head>
+<body>
+<div class="dashboard-container">
+<h1>👩‍💼 HR Dashboard</h1>
+
+<table id="candidateTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Email</th>
+      <th>Name</th>
+      <th>Mobile No</th>
+      <th>Skills</th>
+      <th>Aptitude</th>
+      <th>Coding</th>
+      <th>Behavioral</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div class="no-data" id="noData">Loading candidate data...</div>
+
+<div class="button-container">
+  <button class="refresh-btn" onclick="fetchCandidates()">🔄 Refresh Data</button>
+  <button class="next-button" onclick="window.location.href='/send_report'">Send Email to HR</button>
+  <button class="next-button" onclick="window.location.href='/assessment-completed'">Next</button>
+</div>
+</div>
+</div>
+<script>
+async function fetchCandidates() {
+  const tableBody = document.querySelector("#candidateTable tbody");
+  const noData = document.getElementById("noData");
+  tableBody.innerHTML = "";
+  noData.textContent = "Loading candidate data...";
+  noData.style.display = "block";
+
+  try {
+    const res = await fetch("/api/candidates?ts=" + new Date().getTime());
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      noData.textContent = "No candidates found.";
+      return;
+    }
+
+    noData.style.display = "none";
+
+    data.forEach(c => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${c.id ?? "N/A"}</td>
+        <td>${c.email ?? "N/A"}</td>
+        <td>${c.name ?? "N/A"}</td>
+        <td>${c.mobile ?? "N/A"}</td>
+        <td>${c.skills ?? "N/A"}</td>
+        <td>${c.aptitude_score ?? "N/A"}</td>
+        <td>${c.coding_score ?? "N/A"}</td>
+        <td>${c.behavioral_score ?? "N/A"}</td>
+        <td>${c.status ?? "Pending"}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  } catch(err) {
+    noData.textContent = "Error loading data.";
+    console.error(err);
+  }
+}
+
+// Fetch on page load
+fetchCandidates();
+</script>
+</body>
+</html>

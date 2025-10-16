@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Details - Aptitude Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; display: flex;
+            align-items: center; justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem; border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%; max-width: 500px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.8s ease-out;
+        }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+        .header { text-align:center; margin-bottom:2rem; }
+        .header h1 { color:#333; font-size:2rem; font-weight:700; margin-bottom:0.5rem; }
+        .header p { color:#666; font-size:1rem; }
+        .form-group { margin-bottom:1.5rem; }
+        .form-group label { display:block; margin-bottom:0.5rem; color:#333; font-weight:600; }
+        .form-group input, .form-group textarea {
+            width:100%; padding:1rem; border:2px solid #e1e5e9;
+            border-radius:10px; font-size:1rem; transition:all 0.3s ease;
+            background:#f8f9fa; font-family:inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline:none; border-color:#667eea; background:white;
+            box-shadow:0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .form-group textarea { resize:vertical; min-height:100px; }
+        .submit-btn {
+            width:100%; padding:1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color:white; border:none; border-radius:10px;
+            font-size:1.1rem; font-weight:600; cursor:pointer;
+            transition:all 0.3s ease; margin-top:1rem;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+        .submit-btn:active { transform: translateY(0); }
+        .loading { display:none; text-align:center; color:#667eea; margin-top:1rem; }
+        .error { background:#fee; color:#c33; padding:1rem; border-radius:10px; margin-top:1rem; display:none; }
+        .success { background:#efe; color:#3c3; padding:1rem; border-radius:10px; margin-top:1rem; display:none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Candidate Details</h1>
+            <p>Please provide your information to proceed</p>
+        </div>
+        
+        <form id="detailsForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="mobile">Mobile Number</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="skills">Skills & Experience</label>
+                <textarea id="skills" name="skills" placeholder="Describe your technical skills, programming languages, and relevant experience..." required></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">Save & Continue</button>
+            <div class="loading" id="loading">Saving your details...</div>
+            <div class="error" id="error"></div>
+            <div class="success" id="success"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('detailsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.querySelector('.submit-btn');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const success = document.getElementById('success');
+
+            error.style.display = 'none';
+            success.style.display = 'none';
+            submitBtn.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                const id = localStorage.getItem('candidate_id');
+                if (!id) throw new Error('Session expired. Please register again.');
+
+                const res = await fetch(`/details/${id}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        name: e.target.name.value,
+                        mobile: e.target.mobile.value,
+                        skills: e.target.skills.value
+                    })
+                });
+                
+                if (res.ok) {
+                    localStorage.setItem('candidate_name', e.target.name.value);
+                    localStorage.setItem('candidate_mobile', e.target.mobile.value);
+                    localStorage.setItem('candidate_skills', e.target.skills.value);
+
+                    success.textContent = 'Details saved successfully! Proceeding to instructions...';
+                    success.style.display = 'block';
+                    
+                    // ✅ Redirect to instructions.html after candidate details
+                    setTimeout(() => { window.location.href = "/instructions"; }, 1500);
+                } else {
+                    const data = await res.json();
+                    throw new Error(data.message || 'Failed to save details');
+                }
+            } catch (err) {
+                error.textContent = err.message;
+                error.style.display = 'block';
+                submitBtn.style.display = 'block';
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aptitude Test</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2b5876, #4e4376);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .video-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        #videoPreview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .question-container {
+            margin-bottom: 30px;
+        }
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .options {
+            margin-bottom: 20px;
+        }
+        .option {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .option input[type="radio"] {
+            margin-right: 10px;
+        }
+        .btn {
+            padding: 12px 24px;
+            background: #00bcd4;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #0097a7;
+        }
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Camera recording (hidden from candidate) -->
+    <div class="video-container" style="display: none;">
+        <video id="videoPreview" autoplay muted></video>
+    </div>
+
+    <div class="container">
+        <div class="progress" id="progress">Question 1 of 3</div>
+        <div id="tabSwitchCounter" style="text-align: center; margin: 10px 0; color: #e74c3c; font-weight: bold; display: none;">
+          ⚠️ Tab Switches: <span id="tabSwitchCount">0</span>
+        </div>
+        
+        <div id="questionBox" class="question-container">
+            <div class="timer-container" style="text-align: center; margin-bottom: 20px;">
+                <div id="timer" style="font-size: 1.5rem; font-weight: bold; color: #ff6b6b; background: rgba(255,107,107,0.1); padding: 10px; border-radius: 10px; display: inline-block;">
+                    Time: <span id="timeDisplay">30</span>s
+                </div>
+            </div>
+            <div class="question" id="question">Loading questions...</div>
+            <div class="options" id="options"></div>
+            <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+        </div>
+
+        <div id="results" class="hidden" style="display: none;">
+            <h2>Test Completed!</h2>
+            <p id="scoreDisplay">Calculating your score...</p>
+            <p id="candidateInfo" style="margin-top: 20px; font-size: 0.9rem; color: #666;"></p>
+        </div>
+    </div>
+
+<script>
+        // Global variables
+        let globalCandidateId = null;
+        let questionTimer = null;
+        let timeLeft = 30; // 30 seconds per question
+        let tabSwitchCount = 0;
+        
+        // Tab switching detection
+        function trackTabSwitch() {
+          tabSwitchCount++;
+          console.log(`Tab switch detected! Count: ${tabSwitchCount}`);
+          
+          // Update visual counter
+          const counter = document.getElementById('tabSwitchCounter');
+          const countSpan = document.getElementById('tabSwitchCount');
+          if (counter && countSpan) {
+            countSpan.textContent = tabSwitchCount;
+            counter.style.display = 'block';
+          }
+          
+          // Send to backend
+          if (globalCandidateId) {
+            fetch(`/track_tab_switch/${globalCandidateId}`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'}
+            })
+            .then(res => res.json())
+            .then(data => {
+              console.log('Tab switch recorded:', data);
+            })
+            .catch(err => console.error('Error recording tab switch:', err));
+          }
+          
+          // Show warning EVERY time
+          showTabSwitchWarning();
+        }
+        
+        function showTabSwitchWarning() {
+          // Create warning modal
+          const warningModal = document.createElement('div');
+          warningModal.id = 'tabWarningModal';
+          warningModal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          `;
+          
+          warningModal.innerHTML = `
+            <div style="
+              background: white;
+              padding: 30px;
+              border-radius: 10px;
+              text-align: center;
+              max-width: 500px;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            ">
+              <div style="font-size: 3rem; margin-bottom: 20px;">⚠️</div>
+              <h2 style="color: #e74c3c; margin-bottom: 20px;">Tab Switching Detected!</h2>
+              <p style="font-size: 1.1rem; margin-bottom: 20px; line-height: 1.5;">
+                <strong>Warning:</strong> You are not allowed to switch tabs during the test.<br>
+                This is your <strong>${tabSwitchCount}</strong> tab switch.
+              </p>
+              <p style="color: #666; margin-bottom: 30px;">
+                Please stay on this page and focus on the test. Multiple tab switches may result in test disqualification.
+              </p>
+              <button onclick="closeTabWarning()" style="
+                background: #e74c3c;
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 5px;
+                font-size: 1rem;
+                cursor: pointer;
+              ">I Understand</button>
+            </div>
+          `;
+          
+          document.body.appendChild(warningModal);
+        }
+        
+        function closeTabWarning() {
+          const modal = document.getElementById('tabWarningModal');
+          if (modal) {
+            modal.remove();
+          }
+        }
+        
+        // Event listeners for tab switching
+        document.addEventListener('visibilitychange', function() {
+          if (document.hidden) {
+            trackTabSwitch();
+          }
+        });
+        
+        // Additional detection methods
+        window.addEventListener('blur', function() {
+          // Only track if test is active (questions loaded)
+          if (window.questions && window.questions.length > 0) {
+            trackTabSwitch();
+          }
+        });
+        
+        // Prevent right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          trackTabSwitch();
+        });
+        
+        // Prevent F12, Ctrl+Shift+I, etc.
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'F12' || 
+              (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+              (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+              (e.ctrlKey && e.key === 'u')) {
+            e.preventDefault();
+            trackTabSwitch();
+          }
+        });
+        
+        // Debug: Check if page loads
+        console.log("Page loaded, starting test...");
+        
+        // Load 3 random aptitude questions from backend
+        async function loadQuestions() {
+          try {
+            console.log("Loading questions...");
+            const res = await fetch("/get_questions");
+            console.log("Response status:", res.status);
+  const data = await res.json();
+            console.log("Questions data:", data);
+            window.questions = data.questions;
+            window.currentIndex = 0;
+            window.answers = [];
+            console.log("Questions loaded:", window.questions.length);
+            showQuestion();
+          } catch (err) {
+            console.error("Error fetching questions:", err);
+            document.getElementById("question").textContent = "Error loading questions. Please refresh the page.";
+          }
+        }
+
+        function startTimer() {
+          timeLeft = 30; // Reset timer to 30 seconds
+          document.getElementById("timeDisplay").textContent = timeLeft;
+          
+          questionTimer = setInterval(() => {
+            timeLeft--;
+            document.getElementById("timeDisplay").textContent = timeLeft;
+            
+            // Change color when time is running out
+            if (timeLeft <= 10) {
+              document.getElementById("timer").style.color = "#ff0000";
+              document.getElementById("timer").style.background = "rgba(255,0,0,0.2)";
+            }
+            
+            if (timeLeft <= 0) {
+              clearInterval(questionTimer);
+              // Auto-submit current question if no answer selected
+              const selected = document.querySelector('input[name="answer"]:checked');
+              if (!selected) {
+                // No answer selected, mark as wrong and move to next
+                window.answers.push(-1); // -1 indicates no answer
+                window.currentIndex++;
+                if (window.currentIndex < window.questions.length) {
+                  showQuestion();
+                } else {
+                  submitAnswers();
+                }
+              } else {
+                // Answer selected, move to next question
+                nextQuestion();
+              }
+            }
+          }, 1000);
+        }
+
+        function stopTimer() {
+          if (questionTimer) {
+            clearInterval(questionTimer);
+            questionTimer = null;
+          }
+        }
+
+        function showQuestion() {
+          stopTimer(); // Stop any existing timer
+          
+          const questionBox = document.getElementById("questionBox");
+          const progress = document.getElementById("progress");
+          const nextBtn = document.getElementById("nextBtn");
+
+          if (window.currentIndex >= window.questions.length) {
+            submitAnswers();
+            return;
+          }
+
+          const q = window.questions[window.currentIndex];
+          console.log("Showing question:", q);
+
+          // Update progress
+          progress.textContent = `Question ${window.currentIndex + 1} of ${window.questions.length}`;
+
+          // Update question
+          document.getElementById("question").textContent = q.question;
+
+          // Update options
+          const optionsContainer = document.getElementById("options");
+          let optsHtml = "";
+          q.options.forEach((opt, idx) => {
+            optsHtml += `
+              <div class="option">
+                <label>
+                  <input type="radio" name="answer" value="${idx}"> ${opt}
+                </label>
+              </div>`;
+          });
+          optionsContainer.innerHTML = optsHtml;
+
+          // Reset next button
+          nextBtn.disabled = true;
+          nextBtn.textContent = window.currentIndex === window.questions.length - 1 ? "Submit" : "Next";
+          
+          // Start timer for this question
+          startTimer();
+
+          // Add event listeners to radio buttons
+          document.querySelectorAll('input[name="answer"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+              nextBtn.disabled = false;
+            });
+          });
+        }
+
+        function nextQuestion() {
+          const selected = document.querySelector('input[name="answer"]:checked');
+          if (!selected) {
+            alert("Please select an option before proceeding.");
+            return;
+          }
+
+          stopTimer(); // Stop the timer when moving to next question
+          window.answers.push(parseInt(selected.value));
+          window.currentIndex++;
+  showQuestion();
+}
+
+        async function submitAnswers() {
+          stopTimer(); // Stop any running timer
+          
+          let score = 0;
+          window.questions.forEach((q, idx) => {
+            if (window.answers[idx] === q.answer) {
+              score++;
+            }
+          });
+
+          // Use global candidate ID
+          if (!globalCandidateId) {
+            alert("Candidate ID not found. Please refresh the page and try again.");
+            return;
+          }
+
+          console.log("Submitting score:", score, "for candidate:", globalCandidateId);
+
+          try {
+            const response = await fetch(`/submit_aptitude/${globalCandidateId}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ score: score })
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("Submission successful:", result);
+            
+            // Show loading message and redirect immediately
+            document.getElementById("questionBox").innerHTML = `
+              <div style="text-align: center; padding: 50px;">
+                <h2>Test Submitted Successfully!</h2>
+                <p>Processing your results...</p>
+                <div style="margin-top: 20px;">
+                  <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                </div>
+                <p style="margin-top: 20px; color: #666;">Redirecting to results page...</p>
+              </div>
+            `;
+            
+            // Add CSS for loading animation
+            const style = document.createElement('style');
+            style.textContent = `
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `;
+            document.head.appendChild(style);
+
+            // Redirect after 2 seconds
+            setTimeout(() => {
+              window.location.href = "/next-round";
+            }, 2000);
+
+          } catch (error) {
+            console.error("Error submitting answers:", error);
+            console.error("Error details:", error.message);
+            alert(`Error submitting answers: ${error.message}. Please check console for details.`);
+          }
+        }
+
+        // Start recording when page loads
+        async function startRecording() {
+          const video = document.getElementById("videoPreview");
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            video.srcObject = stream;
+
+            window.mediaRecorder = new MediaRecorder(stream);
+            window.chunks = [];
+
+            window.mediaRecorder.ondataavailable = e => window.chunks.push(e.data);
+
+            window.mediaRecorder.onstop = async () => {
+              const blob = new Blob(window.chunks, { type: 'video/webm' });
+              const formData = new FormData();
+              formData.append('video', blob, `${localStorage.getItem("candidate_id")}.webm`);
+              await fetch(`/upload_video/${localStorage.getItem("candidate_id")}` , {
+                method: 'POST',
+                body: formData
+              });
+              console.log("Video uploaded");
+            };
+
+            window.mediaRecorder.start();
+          } catch (err) {
+            console.log("Camera permission denied or not available");
+          }
+        }
+
+        function stopAndUploadVideo() {
+          if (window.mediaRecorder && window.mediaRecorder.state !== "inactive") {
+            window.mediaRecorder.stop();
+          }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+          console.log("DOM loaded, starting...");
+          
+          // Check for candidate ID first and set global variable
+          globalCandidateId = localStorage.getItem("candidate_id");
+          if (!globalCandidateId) {
+            alert("Candidate details not found. Please fill out the candidate form first.");
+            window.location.href = "/candidate-form";
+            return;
+          }
+          
+          console.log("Candidate ID found:", globalCandidateId);
+loadQuestions();
+          startRecording();
+        });
+</script>
+</body>
+</html>
