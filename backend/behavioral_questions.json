@@ -1,0 +1,172 @@
+[
+  {
+    "id": 1,
+    "type": "mcq",
+    "category": "work_ethics",
+    "question": "Can you work during non-work hours in case of emergency?",
+    "options": {
+      "A": "Always available",
+      "B": "Sometimes, if it's critical",
+      "C": "Only if properly compensated",
+      "D": "Never, work-life balance is important"
+    },
+    "weights": {
+      "A": 100,
+      "B": 80,
+      "C": 60,
+      "D": 40
+    }
+  },
+  {
+    "id": 2,
+    "type": "mcq",
+    "category": "leadership",
+    "question": "If a senior tells you your approach is wrong (but it's correct), you would:",
+    "options": {
+      "A": "Accept silently and follow their way",
+      "B": "Present evidence politely and discuss",
+      "C": "Escalate to higher management immediately",
+      "D": "Ignore their feedback and continue"
+    },
+    "weights": {
+      "A": 30,
+      "B": 100,
+      "C": 70,
+      "D": 20
+    }
+  },
+  {
+    "id": 3,
+    "type": "mcq",
+    "category": "problem_solving",
+    "question": "When facing an impossible deadline, you would:",
+    "options": {
+      "A": "Work 24/7 to meet it",
+      "B": "Ask for help and resources",
+      "C": "Negotiate a realistic timeline",
+      "D": "Panic and work chaotically"
+    },
+    "weights": {
+      "A": 70,
+      "B": 90,
+      "C": 100,
+      "D": 20
+    }
+  },
+  {
+    "id": 4,
+    "type": "mcq",
+    "category": "communication",
+    "question": "Your preferred communication style with clients:",
+    "options": {
+      "A": "Always formal and professional",
+      "B": "Casual and friendly",
+      "C": "Technical and detailed",
+      "D": "Adaptable based on client preference"
+    },
+    "weights": {
+      "A": 80,
+      "B": 60,
+      "C": 70,
+      "D": 100
+    }
+  },
+  {
+    "id": 5,
+    "type": "mcq",
+    "category": "cultural_fit",
+    "question": "Rate your stress tolerance level:",
+    "options": {
+      "A": "Very high (9-10)",
+      "B": "High (7-8)",
+      "C": "Moderate (5-6)",
+      "D": "Low (1-4)"
+    },
+    "weights": {
+      "A": 90,
+      "B": 100,
+      "C": 80,
+      "D": 50
+    }
+  },
+  {
+    "id": 6,
+    "type": "written",
+    "category": "work_ethics",
+    "question": "Describe a time you had to work overtime or during non-work hours. How did you handle it and what was the outcome?",
+    "expected_keywords": ["commitment", "dedication", "responsibility", "team", "project", "deadline", "priority"],
+    "min_words": 30
+  },
+  {
+    "id": 7,
+    "type": "written",
+    "category": "leadership",
+    "question": "Tell us about a conflict you resolved in your team or workplace. What was the situation and how did you handle it?",
+    "expected_keywords": ["conflict", "resolution", "team", "communication", "understanding", "compromise", "leadership"],
+    "min_words": 40
+  },
+  {
+    "id": 8,
+    "type": "written",
+    "category": "problem_solving",
+    "question": "Describe a major project failure you experienced. What went wrong, how did you handle it, and what did you learn?",
+    "expected_keywords": ["failure", "mistake", "learning", "improvement", "analysis", "solution", "prevention"],
+    "min_words": 35
+  },
+  {
+    "id": 9,
+    "type": "written",
+    "category": "communication",
+    "question": "How do you handle difficult or negative feedback from clients or colleagues? Provide a specific example.",
+    "expected_keywords": ["feedback", "criticism", "professional", "improvement", "understanding", "response", "constructive"],
+    "min_words": 30
+  },
+  {
+    "id": 10,
+    "type": "written",
+    "category": "cultural_fit",
+    "question": "Describe your ideal work environment and company culture. What values are most important to you?",
+    "expected_keywords": ["culture", "values", "environment", "teamwork", "collaboration", "innovation", "respect"],
+    "min_words": 25
+  },
+  {
+    "id": 11,
+    "type": "written",
+    "category": "work_ethics",
+    "question": "How do you prioritize tasks when everything seems urgent? Walk us through your decision-making process.",
+    "expected_keywords": ["priority", "urgent", "important", "decision", "process", "analysis", "deadline"],
+    "min_words": 30
+  },
+  {
+    "id": 12,
+    "type": "written",
+    "category": "leadership",
+    "question": "Describe a time when you had to lead a project or initiative. What challenges did you face and how did you overcome them?",
+    "expected_keywords": ["lead", "project", "initiative", "challenge", "overcome", "team", "management"],
+    "min_words": 35
+  },
+  {
+    "id": 13,
+    "type": "written",
+    "category": "problem_solving",
+    "question": "Tell us about a time you had to learn a new technology or skill quickly for work. How did you approach it?",
+    "expected_keywords": ["learn", "technology", "skill", "quickly", "approach", "research", "practice", "adapt"],
+    "min_words": 30
+  },
+  {
+    "id": 14,
+    "type": "written",
+    "category": "communication",
+    "question": "How do you ensure effective communication in a remote or virtual team environment?",
+    "expected_keywords": ["communication", "remote", "virtual", "team", "effective", "tools", "clarity", "regular"],
+    "min_words": 25
+  },
+  {
+    "id": 15,
+    "type": "written",
+    "category": "cultural_fit",
+    "question": "What motivates you most in your work? How do you stay motivated during challenging times?",
+    "expected_keywords": ["motivate", "motivation", "challenging", "perseverance", "goal", "achievement", "growth"],
+    "min_words": 30
+  }
+]
