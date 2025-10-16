@@ -27,6 +27,8 @@ Security: Tab switching detection, camera monitoring
 
 Install dependencies
 pip install flask flask-sqlalchemy flask-cors
+
+
 pip install reportlab
 
 
