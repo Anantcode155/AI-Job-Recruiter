@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Coding Round</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Coding Round</h2>
+
+    <label for="problemSelect">Select Problem</label>
+    <select id="problemSelect"></select>
+
+    <div id="problemDescription" class="problem"></div>
+
+    <label for="language">Language</label>
+    <select id="language">
+      <option value="71">Python (3.8.1)</option>
+      <option value="62">Java (OpenJDK 13.0.1)</option>
+      <option value="54">C++ (GCC 9.2.0)</option>
+      <option value="63">JavaScript (Node.js 12.14.0)</option>
+    </select>
+
+    <label for="sourceCode">Source Code</label>
+    <textarea id="sourceCode" rows="12" placeholder="Write your solution here..."></textarea>
+
+    <div>
+      <button onclick="runCode()">Run</button>
+      <button onclick="submitCode()">Submit</button>
+    </div>
+
+    <div id="outputBox" class="output"></div>
+  </div>
+
+  <script>
+    // Provide questions to the JS runtime
+    window.codingQuestions = {{ questions | tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='script_coding.js') }}"></script>
+</body>
+</html>
+
+

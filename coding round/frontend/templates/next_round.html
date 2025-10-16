@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Proceed to Coding Round</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Your aptitude test score has been recorded.</h2>
+    <p>You can now proceed to the coding round.</p>
+    <form action="/coding_round" method="get">
+      <button type="submit" class="btn">Go to Coding Round</button>
+    </form>
+  </div>
+</body>
+</html>
