@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coding Round Completed</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      color: #fff;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #e0f7fa;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: #cfd8dc;
+    }
+    .next-round-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(52, 152, 219, 0.1);
+      border-radius: 10px;
+      border: 2px solid #3498db;
+    }
+    h3 {
+      margin: 0 0 15px 0;
+      color: #e0f7fa;
+      font-size: 1.6rem;
+    }
+    .btn {
+      background-color: #28a745;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+    .btn:active {
+      transform: translateY(0);
+    }
+    .icon {
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎉 Coding Round Completed!</h1>
+    <p>Congratulations! You have successfully completed the coding assessment.</p>
+    <p>Your coding score has been successfully recorded in the database.</p>
+
+    <div class="next-round-section">
+      <h3>Next Round: Behavioral Assessment</h3>
+      <p>Ready to proceed to the final behavioral assessment?</p>
+      <button onclick="goToBehavioralRound()" class="btn">
+        <span class="icon">🧠</span> Start Behavioral Round
+      </button>
+    </div>
+
+    <p style="margin-top: 20px; font-size: 0.9rem; color: #cfd8dc;">
+      Thank you for participating in our assessment process.
+      HR will review your results and contact you soon.
+    </p>
+  </div>
+
+  <script>
+    function goToBehavioralRound() {
+      const candidateId = localStorage.getItem("candidate_id");
+      if (!candidateId) {
+        alert("Candidate details not found. Please start from the beginning.");
+        window.location.href = "/";
+        return;
+      }
+      window.location.href = "/behavioral-round";
+    }
+  </script>
+</body>
+</html>

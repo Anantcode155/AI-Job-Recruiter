@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Completed - Thank You</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      padding: 60px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    .celebration {
+      font-size: 5rem;
+      margin-bottom: 30px;
+      animation: bounce 2s infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-15px);
+      }
+      60% {
+        transform: translateY(-8px);
+      }
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 25px;
+      color: #fff;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 1.4rem;
+      margin-bottom: 40px;
+      color: #e0f7fa;
+      font-weight: 300;
+      position: relative;
+      z-index: 1;
+      line-height: 1.6;
+    }
+
+    .thank-you-section {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 40px;
+      margin: 40px 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      z-index: 1;
+    }
+
+    .thank-you-section h2 {
+      color: #fff;
+      margin-bottom: 25px;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .thank-you-section p {
+      color: #e0f7fa;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+
+    .highlight {
+      background: rgba(46, 204, 113, 0.2);
+      color: #ffffff;
+      padding: 15px 25px;
+      border-radius: 15px;
+      border: 2px solid #2ecc71;
+      margin: 25px 0;
+      font-weight: bold;
+      font-size: 1.1rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .assessment-summary {
+      background: rgba(52, 152, 219, 0.1);
+      border-radius: 20px;
+      padding: 35px;
+      margin: 40px 0;
+      border: 2px solid #3498db;
+      position: relative;
+      z-index: 1;
+    }
+
+    .assessment-summary h3 {
+      color: #ffffff;
+      margin-bottom: 25px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .rounds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      margin: 25px 0;
+    }
+
+    .round-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .round-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .round-item h4 {
+      color: #fff;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .round-item p {
+      color: #e0f7fa;
+      font-size: 0.95rem;
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .status-completed {
+      background: rgba(46, 204, 113, 0.3);
+      color: #ffffff;
+      border: 2px solid #2ecc71;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .next-steps {
+      background: rgba(155, 89, 182, 0.1);
+      border-radius: 20px;
+      padding: 35px;
+      margin: 40px 0;
+      border: 2px solid #9b59b6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .next-steps h3 {
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .next-steps ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .next-steps li {
+      color: #e0f7fa;
+      line-height: 1.8;
+      margin-bottom: 15px;
+      font-size: 1.05rem;
+      padding-left: 30px;
+      position: relative;
+    }
+
+    .next-steps li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #2ecc71;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 18px 35px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      margin: 15px;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 12px 35px rgba(108, 117, 125, 0.4);
+    }
+
+    .footer-message {
+      margin-top: 40px;
+      font-size: 1rem;
+      color: #cfd8dc;
+      opacity: 0.9;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #f39c12;
+      animation: confetti-fall 3s linear infinite;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        padding: 40px 25px;
+        margin: 10px;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      .rounds-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn {
+        padding: 15px 25px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="celebration">🎉</div>
+      <h1>Assessment Completed!</h1>
+      <p class="subtitle">Thank you for your dedication and effort in completing our comprehensive assessment process.</p>
+
+      <div class="thank-you-section">
+        <h2>🙏 Thank You for Your Effort!</h2>
+        <p>We sincerely appreciate the time and effort you've invested in completing all three rounds of our assessment.</p>
+        <p>Your responses have been carefully analyzed and all your scores have been successfully recorded in our system.</p>
+        
+        <div class="highlight">
+          📊 All your assessment data has been securely stored and sent to our HR team for review.
+        </div>
+        
+        <p><strong>Our HR team will contact you upon your selection for the next stage of the recruitment process.</strong></p>
+      </div>
+
+      <div class="assessment-summary">
+        <h3>📋 Assessment Summary</h3>
+        <div class="rounds-grid">
+          <div class="round-item">
+            <h4>🧠 Aptitude Test</h4>
+            <p>Logical reasoning and problem-solving skills</p>
+            <p>Questions: 3</p>
+            <p>Duration: 30 minutes</p>
+            <span class="status-badge status-completed">✅ Completed</span>
+          </div>
+          <div class="round-item">
+            <h4>💻 Coding Round</h4>
+            <p>Programming and algorithm skills</p>
+            <p>Questions: 3</p>
+            <p>Duration: 45 minutes</p>
+            <span class="status-badge status-completed">✅ Completed</span>
+          </div>
+          <div class="round-item">
+            <h4>🎯 Behavioral Assessment</h4>
+            <p>Work ethics and cultural fit evaluation</p>
+            <p>Questions: 15</p>
+            <p>Duration: 30 minutes</p>
+            <span class="status-badge status-completed">✅ Completed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-steps">
+        <h3>📋 What Happens Next?</h3>
+        <ul>
+          <li>Your responses have been analyzed using advanced AI-powered algorithms</li>
+          <li>HR team will review your comprehensive assessment results</li>
+          <li>You will be contacted within 3-5 business days</li>
+          <li>All your data is securely stored and will be used for evaluation purposes only</li>
+          <li>We maintain strict confidentiality of all candidate information</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 40px;">
+        <a href="/" class="btn btn-secondary">🏠 Return to Home</a>
+        <button onclick="window.location.href='/generate_latest_report'" class="btn">📄 Download Report</button>
+      </div>
+
+      <div class="footer-message">
+        <p>Thank you for participating in our comprehensive assessment process.</p>
+        <p>We wish you the best of luck and look forward to potentially working with you!</p>
+        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+          <em>This assessment system is designed to evaluate candidates fairly and objectively.</em>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+      // Create confetti effect
+    function createConfetti() {
+      const confettiContainer = document.getElementById('confetti');
+      const colors = ['#f39c12', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#f1c40f'];
+      
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        confettiContainer.appendChild(confetti);
+      }
+      
+      // Remove confetti after animation
+      setTimeout(() => {
+        confettiContainer.innerHTML = '';
+      }, 5000);
+    }
+
+    // Initialize effects when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Start confetti effect
+      setTimeout(createConfetti, 500);
+      
+      // Add some interactive sparkles
+      setTimeout(() => {
+        const sparkle = document.createElement('div');
+        sparkle.innerHTML = '✨';
+        sparkle.style.position = 'fixed';
+        sparkle.style.top = '20%';
+        sparkle.style.left = Math.random() * 100 + '%';
+        sparkle.style.fontSize = '2rem';
+        sparkle.style.animation = 'bounce 1s ease-out';
+        sparkle.style.zIndex = '1000';
+        sparkle.style.pointerEvents = 'none';
+        document.body.appendChild(sparkle);
+        
+        setTimeout(() => {
+          sparkle.remove();
+        }, 2000);
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

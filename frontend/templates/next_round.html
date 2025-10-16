@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Next Round</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background: linear-gradient(135deg, #2b5876, #4e4376);
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      max-width: 500px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .card h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+    .card p {
+      font-size: 1.2rem;
+    }
+    @keyframes fadeIn {
+      from {opacity:0; transform: translateY(-10px);}
+      to {opacity:1; transform: translateY(0);}
+    }
+    .btn {
+      margin-top: 25px;
+      padding: 10px 20px;
+      background: #00bcd4;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #0097a7;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎉 Aptitude Test Completed!</h1>
+    <p>Congratulations! You have successfully completed the aptitude assessment.</p>
+    <p>Your Score has been successfully recorded.</p>
+    
+    <div style="margin: 30px 0; padding: 20px; background: rgba(52, 152, 219, 0.1); border-radius: 10px; border: 2px solid #3498db;">
+      <h3 style="margin: 0 0 15px 0; color: #2c3e50;">Next Round: Coding Assessment</h3>
+      <p style="margin: 0 0 15px 0; color: #34495e;">Ready to test your coding skills? Click below to proceed to the coding round.</p>
+      <button onclick="goToCodingRound()" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">
+        🚀 Start Coding Round
+      </button>
+    </div>
+    
+    <p style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+      Thank you for participating in our assessment process. 
+      HR will review your results and contact you soon.
+    </p>
+  </div>
+
+  <script>
+    function goToCodingRound() {
+      // Get candidate ID from localStorage
+      const candidateId = localStorage.getItem("candidate_id");
+      if (!candidateId) {
+        alert("Candidate details not found. Please start from the beginning.");
+        window.location.href = "/";
+        return;
+      }
+      
+      // Navigate to coding round
+      window.location.href = "/coding-round";
+    }
+  </script>
+</body>
+</html>

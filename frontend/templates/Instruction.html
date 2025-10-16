@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructions Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      backdrop-filter: blur(10px);
+      animation: slideUp 0.8s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+
+    ul {
+      margin-left: 20px;
+      line-height: 1.6;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    .note {
+      background: #eaf2f8;
+      padding: 10px;
+      border-left: 4px solid #3498db;
+      margin-top: 20px;
+      border-radius: 8px;
+    }
+
+    .button-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .next-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .next-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .next-button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Instructions for Candidates</h1>
+    <ul>
+      <li>Ensure a stable internet connection throughout the test.</li>
+      <li>Avoid switching tabs, opening new applications, or taking screenshots.</li>
+      <li>Keep your camera and microphone on if prompted.</li>
+      <li>Read all questions carefully before answering.</li>
+      <li>Manage your time efficiently to complete all sections within the limits.</li>
+      <li>Do not use any external help, notes, or online resources unless explicitly allowed.</li>
+      <li>Answer all questions honestly; do not attempt to manipulate the system.</li>
+      <li>If you encounter any technical issues, report them immediately to the support team.</li>
+      <li>Ensure your environment is quiet and free from distractions.</li>
+      <li>Refresh the page or restart the test only if instructed by the administrator.</li>
+    </ul>
+    <div class="note">
+      Note: Scores are automatically calculated and available after completing all sections.
+    </div>
+    <div class="button-container">
+      <button class="next-button" onclick="window.location.href='/aptitude-test'">Start Aptitude Test</button>
+    </div>
+  </div>
+</body>
+</html>
